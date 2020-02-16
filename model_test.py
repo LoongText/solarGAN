@@ -19,6 +19,7 @@ from models import *
 from datasets import *
 import glob
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--epoch", type=int, default=0, help="epoch to start training from")
 parser.add_argument("--n_epochs", type=int, default=200, help="number of epochs of training")
