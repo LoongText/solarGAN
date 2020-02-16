@@ -47,20 +47,21 @@ transform_image = transforms.Compose(transforms_)
 patch = (1, opt.img_height//2**4, opt.img_width//2**4)
 generator = GeneratorUNet()
 
+
 def get_test_img(file,transform_image):
-	img = Image.open(file)
-	w, h = img.size
-	img_A = img.crop((0, 0, w/2, h))
-	img_A = img_A.convert('L')
-	img_B = img.crop((w/2, 0, w, h))
-	img_B = img_B.convert('L')
-	img_A = transform_image(img_A)
-	img_B = transform_image(img_B)
+    img = Image.open(file)
+    w, h = img.size
+    img_A = img.crop((0, 0, w/2, h))
+    img_A = img_A.convert('L')
+    img_B = img.crop((w/2, 0, w, h))
+    img_B = img_B.convert('L')
+    img_A = transform_image(img_A)
+    img_B = transform_image(img_B)
 
-	img_A = img_A.view(-1, 1, 512, 512)
-	img_B = img_B.view(-1, 1, 512, 512)
+    img_A = img_A.view(-1, 1, 512, 512)
+    img_B = img_B.view(-1, 1, 512, 512)
 
-	return {'img_A': img_A, 'img_B': img_B}
+    return {'img_A': img_A, 'img_B': img_B}
 
 
 generator.load_state_dict(torch.load('saved_models/generator.pth', map_location=torch.device('cpu')))
@@ -70,11 +71,11 @@ print(files)
 
 for file in files:
     print(file)
-	imgs = get_test_img(file, transform_image)
-	img_A = Variable(imgs['img_A'])
-	img_B = Variable(imgs['img_B'])
-	fake = generator(img_A)
-	img_sample = torch.cat((img_A.data, fake.data, img_B.data), -2)
-	os.makedirs('test_results', exist_ok=True)
-	save_image(img_sample, 'test_results/%s' % file[5:], normalize=True)
-	print('%s is tested' % file)
+    imgs = get_test_img(file, transform_image)
+    img_A = Variable(imgs['img_A'])
+    img_B = Variable(imgs['img_B'])
+    fake = generator(img_A)
+    img_sample = torch.cat((img_A.data, fake.data, img_B.data), -2)
+    os.makedirs('test_results', exist_ok=True)
+    save_image(img_sample, 'test_results/%s' % file[5:], normalize=True)
+    print('%s is tested' % file)

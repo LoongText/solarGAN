@@ -76,10 +76,10 @@ print('this is discriminator.')
 print(discriminator)
 
 if cuda:
-    #generator = generator.cuda()
-    #discriminator = discriminator.cuda()
-    #criterion_GAN.cuda()
-    #criterion_pixelwise.cuda()
+    # generator = generator.cuda()
+    # discriminator = discriminator.cuda()
+    # criterion_GAN.cuda()
+    # criterion_pixelwise.cuda()
 
     generator = generator.to(device=cuda)
     discriminator = discriminator.to(device=cuda)
