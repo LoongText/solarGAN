@@ -42,7 +42,7 @@ parser.add_argument('--decay_epoch', type=int, default=100, help='epoch from whi
 parser.add_argument('--n_cpu', type=int, default=8, help='number of cpu threads to use during batch generation')
 parser.add_argument('--img_height', type=int, default=512, help='size of image height')
 parser.add_argument('--img_width', type=int, default=512, help='size of image width')
-parser.add_argument('--channels', type=int, default=3, help='number of image channels')
+parser.add_argument('--channels', type=int, default=1, help='number of image channels')
 parser.add_argument('--sample_interval', type=int, default=500, help='interval between sampling of images from generators')
 parser.add_argument('--checkpoint_interval', type=int, default=1, help='interval between model checkpoints')
 opt = parser.parse_args()
@@ -102,7 +102,9 @@ optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt
 # Configure dataloaders
 transforms_ = [ transforms.Resize((opt.img_height, opt.img_width), Image.BICUBIC),
                 transforms.ToTensor(),
-                transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5)) ]
+                transforms.Normalize([0.5], [0.5] ]
+
+vgg_transforms_ = transforms.Grayscale(num_output_channels=3)
 
 dataloader = DataLoader(ImageDataset("../../data/%s" % opt.dataset_name, transforms_=transforms_),
                         batch_size=opt.batch_size, shuffle=True, num_workers=opt.n_cpu)
@@ -152,8 +154,9 @@ for epoch in range(opt.epoch, opt.n_epochs):
         # Pixel-wise loss
         loss_pixel = criterion_pixelwise(fake_B, real_B)
         # perceptual loss
-        percep_fake_B = vgg(fake_B)
-        percep_real_B = vgg(real_B)
+        percep_fake_B = vgg(vgg_transforms_(fake_B))
+        percep_real_B = vgg(vgg_transforms_(real_B))
+        percep_real_B = vgg(vgg_transforms_(real_B))
         a, b, c, d = vgg(real_B)
         print(type(percep_real_B))
 
@@ -204,9 +207,7 @@ for epoch in range(opt.epoch, opt.n_epochs):
                                                         loss_pixel.item(), loss_GAN.item(),
                                                         time_left))
         G_loss.append(loss_G.item())
-        D_loss.append(loss_D.item())
-
-        
+        D_loss.append(loss_D.item())       
         # If at sample interval save image
         if batches_done % opt.sample_interval == 0:
             sample_images(batches_done)
@@ -222,4 +223,3 @@ G_loss = np.array(G_loss)
 D_loss = np.array(D_loss)
 np.savetxt('G_loss.csv', G_loss, delimiter = ',')
 np.savetxt('D_loss.csv', D_loss, delimiter = ',')
-

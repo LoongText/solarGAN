@@ -41,7 +41,7 @@ print(opt)
 
 transforms_ = [transforms.Resize((opt.img_height, opt.img_width), Image.BICUBIC),
                 transforms.ToTensor(),
-                transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))]
+                transforms.Normalize([0.5], [0.5]]
 
 transform_image = transforms.Compose(transforms_)
 patch = (1, opt.img_height//2**4, opt.img_width//2**4)
@@ -51,14 +51,14 @@ def get_test_img(file,transform_image):
 	img = Image.open(file)
 	w, h = img.size
 	img_A = img.crop((0, 0, w/2, h))
-	img_A = img_A.convert('RGB')
+	img_A = img_A.convert('L')
 	img_B = img.crop((w/2, 0, w, h))
-	img_B = img_B.convert('RGB')
+	img_B = img_B.convert('L')
 	img_A = transform_image(img_A)
 	img_B = transform_image(img_B)
 
-	img_A = img_A.view(-1, 3, 512, 512)
-	img_B = img_B.view(-1, 3, 512, 512)
+	img_A = img_A.view(-1, 1, 512, 512)
+	img_B = img_B.view(-1, 1, 512, 512)
 
 	return {'img_A': img_A, 'img_B': img_B}
 

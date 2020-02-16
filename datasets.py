@@ -21,16 +21,9 @@ class ImageDataset(Dataset):
         img = Image.open(file)
         w, h = img.size
         img_A = img.crop((0, 0, w/2, h))
-        img_A = img_A.convert('RGB')
+        img_A = img_A.convert('L')
         img_B = img.crop((w/2, 0, w, h))
-        img_B = img_B.convert('RGB')
-        
-
-
-
-        if np.random.random() < 0.5:
-            img_A = Image.fromarray(np.array(img_A)[:, ::-1, :], 'RGB')
-            img_B = Image.fromarray(np.array(img_B)[:, ::-1, :], 'RGB')
+        img_B = img_B.convert('L')
 
         img_A = self.transform(img_A)
         img_B = self.transform(img_B)
@@ -57,9 +50,9 @@ class TestDataset(Dataset):
         img = Image.open(self.files[index % len(self.files)])
         w, h = img.size
         img_A = img.crop((0, 0, w/2, h))
-        img_A = img_A.convert('RGB')
+        img_A = img_A.convert('L')
         img_B = img.crop((w/2, 0, w, h))
-        img_B = img_B.convert('RGB')
+        img_B = img_B.convert('L')
 
         img_A = self.transform(img_A)
         img_B = self.transform(img_B)
